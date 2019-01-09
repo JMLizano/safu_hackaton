@@ -39,8 +39,9 @@ def home():
         if address_id is None:
             raise InvalidUsage("You must provide an address", status_code=400)
         address = Address.query.filter_by(id=address_id).first()
-        outgoing_transactions = address.sended_to
-        incoming_transactions = address.received_from
+        if address is not None:
+            outgoing_transactions = address.sended_to
+            incoming_transactions = address.received_from
     return render_template("home.html",  origin=address, outgoing_transactions=outgoing_transactions, 
                            incoming_transactions=incoming_transactions)
 
