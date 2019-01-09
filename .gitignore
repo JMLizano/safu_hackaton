@@ -1,0 +1,16 @@
+# EDITOR
+.vscode
+
+# DATA FILES
+SQL/simplewiki*
+
+# ENV
+.venv
+.env
+
+# zappa config file
+zappa_settings.json
+
+# Python
+*.pyc
+*.lock
