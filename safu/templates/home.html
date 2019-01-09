@@ -6,8 +6,9 @@
 {% import "bootstrap/utils.html" as utils %}
 
 {% block head %}
-{{super()}}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  {{super()}}
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <script src="{{url_for('static', filename='drawGraph.js')}}"></script>
 {%- endblock %}
 
 {% block content %}
@@ -16,7 +17,7 @@
     <p>Is the transaction address you are sending your crypto to SAFU?</p>
 </div>
 
-<div class="container">
+<div id="main" class="container">
   
   <form method="POST" action="{{ url_for('public.home') }}">
     <div class="form-group">
@@ -25,9 +26,9 @@
     </div>
 
     {% if error %}
-    <div class="alert alert-danger" role="alert">
-        {{ error_message }}
-    </div>
+      <div class="alert alert-danger" role="alert">
+          {{ error_message }}
+      </div>
     {% endif %}
 
     <input type="submit" value="Check">
@@ -36,121 +37,75 @@
 
 
   {% if request.method == 'POST' and not error%}
-  
-  <h3>Outgoing Transactions</h3>
-  
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Destination account</th>
-        <th>Destination account compromised</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for address in outgoing_transactions %}
-      <tr>
-        <td>{{ address.id }}</td>
-        <td>{{ address.compromised }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    
+    <h3>Outgoing Transactions</h3>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Destination account</th>
+          <th>Destination account compromised</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for address in outgoing_transactions %}
+        <tr>
+          <td>{{ address.id }}</td>
+          <td>{{ address.compromised }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
+    <h3>Incoming Transactions</h3>
+      
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Orging account</th>
+          <th>Origin account compromised</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for address in incoming_transactions %}
+        <tr>
+          <td>{{ address.id }}</td>
+          <td>{{ address.compromised }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <h4>Outgoing transactions graphical representation</h4>
+    <div id="mynetwork"></div>
+    <script type="text/javascript">
+      var _nodes = [
+        {id: "{{ origin.id }}", label:"{{ origin.id }}", color: {% if origin.compromised %} 'red' {% else %} 'green' {% endif %}},
+        {% for address in outgoing_transactions %}
+          {id: "{{ address.id }}", label:"{{ address.id }}", color: {% if address.compromised %} 'red' {% else %} 'blue' {% endif %}},
+        {% endfor %}
+        {% for address in incoming_transactions %}
+          {% if address not in outgoing_transactions%}
+          {id: "{{ address.id }}", label:"{{ address.id }}", color: {% if address.compromised %} 'red' {% else %} 'blue' {% endif %}},
+          {% endif %}
+        {% endfor %}
+      ]
 
-  <div id="mynetworkoutgoing"></div>
-
-  <script type="text/javascript">
-  
-  // create an array with nodes 
-  var nodes = new vis.DataSet([
-    {id: 0, label:"{{ origin.id }}", color: {% if origin.compromised %} 'red' {% else %} 'green' {% endif %}},
-    {% for address in outgoing_transactions %}
-    {id: {{loop.index}}, label:"{{ address.id }}", color: {% if address.compromised %} 'red' {% else %} 'blue' {% endif %}},
-    {% endfor %}
-  ])
-
-  // create an array with edges
-  var edges = new vis.DataSet([
-    {% for address in outgoing_transactions %}
-      {from: 0, to: {{loop.index}}},
-    {% endfor %}
-  ]);
-
-  // create a network
-  var container = document.getElementById('mynetworkoutgoing');
-  var data = {
-    nodes: nodes,
-    edges: edges
-  };
-  var options = {
-    nodes: {borderWidth: 2},
-    interaction: {hover: true},
-    height: '400px',
-    width: '100%'
-  }
-  var network = new vis.Network(container, data, options);
-  </script>
-
-
-<h3>Incoming Transactions</h3>
-  
-<table class="table">
-  <thead>
-    <tr>
-      <th>Orging account</th>
-      <th>Origin account compromised</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for address in incoming_transactions %}
-    <tr>
-      <td>{{ address.id }}</td>
-      <td>{{ address.compromised }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-
-<h4>Incoming transactions graphical representation</h4>
-
-<div id="mynetworkincoming"></div>
-
-<script type="text/javascript">
-
-// create an array with nodes 
-var nodes = new vis.DataSet([
-  {id: 0, label:"{{ origin.id }}", color: {% if origin.compromised %} 'red' {% else %} 'green' {% endif %}},
-  {% for address in incoming_transactions %}
-  {id: {{loop.index}}, label:"{{ address.id }}", color: {% if address.compromised %} 'red' {% else %} 'blue' {% endif %}},
-  {% endfor %}
-])
-
-// create an array with edges
-var edges = new vis.DataSet([
-  {% for address in incoming_transactions %}
-    {from: {{loop.index}}, to: 0},
-  {% endfor %}
-]);
-
-// create a network
-var container = document.getElementById('mynetworkincoming');
-var data = {
-  nodes: nodes,
-  edges: edges
-};
-var options = {
-  nodes: {borderWidth: 2},
-  interaction: {hover: true},
-  height: '400px',
-  width: '100%'
-}
-var network = new vis.Network(container, data, options);
-</script>
-  
+      var _edges = [
+        {% for address in outgoing_transactions %}
+          {from: "{{ origin.id }}", to: "{{ address.id }}", arrows: {% if address in incoming_transactions %}'to, from' {% else %}  'to'{% endif %}},
+        {% endfor %}
+        {% for address in incoming_transactions %}
+          {% if address not in outgoing_transactions%}
+            {from: "{{ origin.id }}", to: "{{ address.id }}", arrows: 'from'},
+          {% endif %}
+        {% endfor %}
+      ]
+      
+      drawgraph(_nodes, _edges, 'mynetwork') 
+    </script>
+    
   {% endif %}
 
 </div>
+
 {%- endblock %}

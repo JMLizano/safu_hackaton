@@ -1,3 +1,0 @@
-function drawgraph(nodes, edges) {
-
-}
