@@ -1,9 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('/home/chema/work/git/POC/wikipediaSQL/safu/safu.db')
-
-
-
+conn = sqlite3.connect('safu.db')
 
 sql_create_address_table = """ CREATE TABLE IF NOT EXISTS address (
                                         id varchar PRIMARY KEY,

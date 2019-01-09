@@ -21,14 +21,25 @@ clean: ##=> Deletes current build environment and latest build
 	find . -type d -name '*pycache*' -exec rm -rf {} +
 	find . -name '*.pyc' -exec rm --force {} \;
 	rm Pipfile.lock || exit 0
+	rm safu/safu.db || exit 0
 	@pipenv --rm || exit 0
 
-all: clean install
+all: clean install populate
 
 install: 
 	$(info [+] Installing '$(SERVICE)' dependencies...")
 	pip install pipenv
 	pipenv install --skip-lock -d
+
+populate:
+	touch safu/safu.db 
+	cd safu && pipenv run python utils/populate_db.py 
+
+deploy:
+	VIRTUAL_ENV=.venv/ pipenv run zappa deploy
+
+update:
+	VIRTUAL_ENV=.venv/ pipenv run zappa update
 
 shell:
 	@pipenv shell

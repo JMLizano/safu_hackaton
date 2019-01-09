@@ -25,7 +25,7 @@ function drawgraph(_nodes, _edges, containerElement) {
     var clickedNodes = nodes.get(ids);
     console.log('clicked nodes:', clickedNodes[0].label);
     $.ajax({
-      url: "/",
+      url: window.location.href,
       type: "post",
       data: {address: clickedNodes[0].label },
       success: function(response) {
