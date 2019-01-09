@@ -35,7 +35,7 @@ def home():
     incoming_transactions = []
     address = None
     if request.method == 'POST':
-        address_id = request.form.get('query', None)
+        address_id = request.form.get('address', None)
         if address_id is None:
             raise InvalidUsage("You must provide an address", status_code=400)
         address = Address.query.filter_by(id=address_id).first()
@@ -49,7 +49,7 @@ def home():
 def outdated():
     """Outdated page."""
     if request.method == 'POST':
-        address_id =request.form.get('category', None)
+        address_id =request.form.get('address', None)
         if address_id is None:
             raise InvalidUsage("You must provide an address", status_code=400)
         address = Address(id=address_id, compromised=True)

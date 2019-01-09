@@ -16,8 +16,8 @@
   
   <form method="POST" style="padding-bottom: 30px" action="{{ url_for('public.outdated') }}"> 
     <div class="form-group">
-        <label for="categoryInput">Enter the compromised address</label>
-        <textarea class="form-control" id="categoryInput" rows="1" name="category" placeholder="10hkyBEKt5S2GDfg7aQw6rQepAvnsRyHoYM" required>{{ request.form['category'] }}</textarea>
+        <label for="addressInput">Enter the compromised address</label>
+        <textarea class="form-control" id="addressInput" rows="1" name="address" placeholder="10hkyBEKt5S2GDfg7aQw6rQepAvnsRyHoYM" required>{{ request.form['category'] }}</textarea>
     </div>
     <input type="submit" value="submit">
   </form>
