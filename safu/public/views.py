@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from flask import Blueprint, render_template, request
 import sqlalchemy
 from ..extensions import db
@@ -44,6 +45,20 @@ def home():
             incoming_transactions = address.received_from
     return render_template("home.html",  origin=address, outgoing_transactions=outgoing_transactions, 
                            incoming_transactions=incoming_transactions)
+
+@blueprint.route('/api/address/<id>', methods=['GET'])
+def get_address(id):
+    """Home page."""
+    outgoing_transactions = []
+    incoming_transactions = []
+    address = Address.query.filter_by(id=id).first()
+    if address is not None:
+        outgoing_transactions = address.sended_to
+        incoming_transactions = address.received_from
+    return json.dumps({ 'origin': address.to_dict(), 
+                        'outgoing_transactions': [address.to_dict() for address in outgoing_transactions], 
+                        'incoming_transactions': [address.to_dict() for address in incoming_transactions]
+                      })
 
 
 @blueprint.route('/submit', methods=['GET', 'POST'])

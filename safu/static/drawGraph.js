@@ -1,36 +1,70 @@
-function drawgraph(_nodes, _edges, containerElement) {
-  // create an array with nodes 
-  var nodes = new vis.DataSet(_nodes)
+function drawTransactions(origin, outgoing, incoming) {
 
-  // create an array with edges
-  var edges = new vis.DataSet(_edges);
+}
 
-  // create a network
-  var container = document.getElementById(containerElement);
-  var data = {
-    nodes: nodes,
-    edges: edges
-  };
-  var options = {
-    nodes: {borderWidth: 2},
-    interaction: {hover: true},
-    height: '600px',
-    width: '100%'
-  }
-  var network = new vis.Network(container, data, options);
+function drawgraph(s, origin, outgoing, incoming) {
+  
+  s.graph.clear()
 
-  // Allow to query for a node by clicking on it
-  network.on( 'click', function(properties) {
-    var ids = properties.nodes;
-    var clickedNodes = nodes.get(ids);
-    console.log('clicked nodes:', clickedNodes[0].label);
-    $.ajax({
-      url: window.location.href,
-      type: "post",
-      data: {address: clickedNodes[0].label },
-      success: function(response) {
-        $("body").html(response);
-      }
-    });
+  s.graph.addNode({
+    // Main attributes:
+    id: origin.id,
+    label: origin.id,
+    // Display attributes:
+    x: Math.random(),
+    y: Math.random(),
+    size: 1,
+    color: origin.compromised ? '#ff0000': '#0000ff'
   });
+
+  for(index in outgoing) {
+    address = outgoing[index]
+    s.graph.addNode({
+      // Main attributes:
+      id: address.id,
+      label: address.id,
+      // Display attributes:
+      x: Math.random(),
+      y: Math.random(),
+      size: 1,
+      color: address.compromised ? '#ff0000': '#0000ff'
+    });
+
+    s.graph.addEdge({
+      id: "out_" + address.id,
+      source: origin.id,
+      target: address.id,
+      color: '#000000',
+      type: 'arrow'
+    });
+  }
+
+  for(index in incoming) {
+    address = incoming[index]
+    if (!s.graph.nodes(address.id)) {
+      s.graph.addNode({
+        // Main attributes:
+        id: address.id,
+        label: address.id,
+        // Display attributes:
+        x: Math.random(),
+        y: Math.random(),
+        size: 1,
+        color: address.compromised ? '#ff0000': '#0000ff'
+      });
+    }
+
+    s.graph.addEdge({
+      id: "in_" + address.id,
+      source: address.id,
+      target: origin.id,
+      color: '#000000',
+      type: 'arrow'
+    });
+  }
+
+  sigma.plugins.relativeSize(s, 1);
+  s.refresh();
+  s.startForceAtlas2();
+  window.setTimeout(function() {s.killForceAtlas2()}, 1000);
 }

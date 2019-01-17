@@ -18,4 +18,10 @@ class Address(db.Model):
         backref=db.backref('received_from', lazy='dynamic'), lazy='dynamic')
 
     def __repr__(self):
-        return "<ID: {}>".format(self.title)
+        return "<ID: {}>".format(self.id)
+
+    def to_dict(self):
+        data = {}
+        data["id"] = self.id
+        data["compromised"] = self.compromised
+        return data

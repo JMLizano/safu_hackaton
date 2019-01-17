@@ -9,6 +9,21 @@
   {{super()}}
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
   <script src="{{url_for('static', filename='drawGraph.js')}}"></script>
+  <script src="{{url_for('static', filename='sigma.min.js')}}"></script>
+  <script src="{{url_for('static', filename='plugins/sigma.layout.forceAtlas2/supervisor.js')}}"></script>
+  <script src="{{url_for('static', filename='plugins/sigma.layout.forceAtlas2/worker.js')}}"></script>
+  <script src="{{url_for('static', filename='plugins/sigma.plugins.relativeSize/sigma.plugins.relativeSize.js')}}"></script>
+
+  <style type="text/css">
+    body {
+      margin: 0;
+    }
+    #sigma-network {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 {%- endblock %}
 
 {% block content %}
@@ -19,7 +34,32 @@
 
 <div id="main" class="container">
   
-  <form method="POST" action="{{ url_for('public.home') }}">
+  <script type="text/javascript">
+    function getAddress(address_id) {
+      // Let's first initialize sigma:
+      var s = new sigma('sigma-network');
+      s.settings({
+        minArrowSize: 100
+      });
+      
+      function draw(address_id) {
+        $.getJSON("/api/address/" + address_id, function(json) {
+          drawgraph(s, json.origin, json.outgoing_transactions, json.incoming_transactions)
+        });
+      }
+
+      function onNodeClick(event) {
+        var clickedNode = event.data.node;
+        draw(clickedNode.id)
+      }
+
+      s.bind('clickNode', onNodeClick);
+
+      draw(address_id)
+    }
+  </script>
+
+  <form action="javascript:;" onsubmit="getAddress(document.getElementById('addressInput').value)">
     <div class="form-group">
         <label for="addressInput">Enter the address to check</label>
         <textarea class="form-control" id="addressInput" rows="1" name="address" placeholder="10hkyBEKt5S2GDfg7aQw6rQepAvnsRyHoYM" required>{{ request.form['query'] }}</textarea>
@@ -35,11 +75,11 @@
   </form>
 
 
-
+  <div id="sigma-network"></div>
+  
   {% if request.method == 'POST' and not error%}
     
     <h3>Outgoing Transactions</h3>
-    
     <table class="table">
       <thead>
         <tr>
@@ -58,7 +98,6 @@
     </table>
 
     <h3>Incoming Transactions</h3>
-      
     <table class="table">
       <thead>
         <tr>
@@ -75,35 +114,6 @@
         {% endfor %}
       </tbody>
     </table>
-
-    <div id="mynetwork"></div>
-    <script type="text/javascript">
-      var _nodes = [
-        {id: "{{ origin.id }}", label:"{{ origin.id }}", color: {% if origin.compromised %} 'red' {% else %} 'green' {% endif %}},
-        {% for address in outgoing_transactions %}
-          {id: "{{ address.id }}", label:"{{ address.id }}", color: {% if address.compromised %} 'red' {% else %} 'blue' {% endif %}},
-        {% endfor %}
-        {% for address in incoming_transactions %}
-          {% if address not in outgoing_transactions%}
-          {id: "{{ address.id }}", label:"{{ address.id }}", color: {% if address.compromised %} 'red' {% else %} 'blue' {% endif %}},
-          {% endif %}
-        {% endfor %}
-      ]
-
-      var _edges = [
-        {% for address in outgoing_transactions %}
-          {from: "{{ origin.id }}", to: "{{ address.id }}", arrows: {% if address in incoming_transactions %}'to, from' {% else %}  'to'{% endif %}},
-        {% endfor %}
-        {% for address in incoming_transactions %}
-          {% if address not in outgoing_transactions%}
-            {from: "{{ origin.id }}", to: "{{ address.id }}", arrows: 'from'},
-          {% endif %}
-        {% endfor %}
-      ]
-      
-      drawgraph(_nodes, _edges, 'mynetwork') 
-    </script>
-    
   {% endif %}
 
 </div>
