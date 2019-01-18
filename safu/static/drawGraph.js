@@ -1,10 +1,6 @@
-function drawTransactions(origin, outgoing, incoming) {
-
-}
-
 function drawgraph(s, origin, outgoing, incoming) {
   
-  s.graph.clear()
+  s.graph.clear();
 
   s.graph.addNode({
     // Main attributes:
@@ -66,5 +62,10 @@ function drawgraph(s, origin, outgoing, incoming) {
   sigma.plugins.relativeSize(s, 1);
   s.refresh();
   s.startForceAtlas2();
-  window.setTimeout(function() {s.killForceAtlas2()}, 1000);
+  window.setTimeout(function() {s.killForceAtlas2()}, 250);
+}
+
+function metrics(node) {
+  $('#outgoing').css('width', node.outgoing_transactions.length+'%').attr('aria-valuenow', node.outgoing_transactions.length);
+  $('#incoming').css('width', node.incoming_transactions.length+'%').attr('aria-valuenow', node.incoming_transactions.length);
 }

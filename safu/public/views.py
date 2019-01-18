@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import random
 from flask import Blueprint, render_template, request
 import sqlalchemy
 from ..extensions import db
@@ -43,8 +44,7 @@ def home():
         if address is not None:
             outgoing_transactions = address.sended_to
             incoming_transactions = address.received_from
-    return render_template("home.html",  origin=address, outgoing_transactions=outgoing_transactions, 
-                           incoming_transactions=incoming_transactions)
+    return render_template("home.html")
 
 @blueprint.route('/api/address/<id>', methods=['GET'])
 def get_address(id):
@@ -56,6 +56,7 @@ def get_address(id):
         outgoing_transactions = address.sended_to
         incoming_transactions = address.received_from
     return json.dumps({ 'origin': address.to_dict(), 
+                        'score': random.randint(0, 100),
                         'outgoing_transactions': [address.to_dict() for address in outgoing_transactions], 
                         'incoming_transactions': [address.to_dict() for address in incoming_transactions]
                       })
