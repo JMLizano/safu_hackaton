@@ -20,62 +20,30 @@ class InvalidUsage(Exception):
         self.payload = payload
 
 
-@blueprint.errorhandler(InvalidUsage)
-def handle_invalid_usage(error):
-    return render_template('home.html', error=True, error_message=error.message), error.status_code
-
-
 @blueprint.errorhandler(500)
 def internal_error(error):
     return render_template('500.html'), 500
 
 
-@blueprint.route('/', methods=['GET', 'POST'])
-def home():
-    """Home page."""
-    outgoing_transactions = []
-    incoming_transactions = []
-    address = None
-    if request.method == 'POST':
-        address_id = request.form.get('address', None)
-        if address_id is None:
-            raise InvalidUsage("You must provide an address", status_code=400)
-        address = Address.query.filter_by(id=address_id).first()
-        if address is not None:
-            outgoing_transactions = address.sended_to
-            incoming_transactions = address.received_from
-    return render_template("home.html")
-
 @blueprint.route('/api/address/<ids>', methods=['GET'])
 def get_address(ids):
-    """Home page."""
-    print(ids.split(','))
     addresses = Address.query.filter(Address.id.in_(ids.split(','))).all()
     return json.dumps({ 'addresses': [ address.to_dict() for address in addresses] })
-    # outgoing_transactions = []
-    # incoming_transactions = []
-    # address = Address.query.filter_by(id=id).first()
-    # if address is not None:
-    #     outgoing_transactions = address.sended_to
-    #     incoming_transactions = address.received_from
     
 
 @blueprint.route('/api/transaction/<id>', methods=['GET'])
 def get_transactions(id):
-    """Home page."""
     outgoing_transactions = []
     incoming_transactions = []
     trans = Transaction.query.filter_by(sender_id=id).all()
     return json.dumps({ 'transactions': [t.to_dict() for t in trans] })
 
-@blueprint.route('/submit', methods=['GET', 'POST'])
+
+@blueprint.route('/api/submit', methods=['POST'])
 def outdated():
     """Outdated page."""
-    if request.method == 'POST':
-        address_id =request.form.get('address', None)
-        if address_id is None:
-            raise InvalidUsage("You must provide an address", status_code=400)
-        address = Address(id=address_id, compromised=True)
-        db.session.merge(address)
-        db.session.commit()
-    return render_template("submit.html")
+    address_id =request.form.get('address', None)
+    address = Address(id=address_id, compromised=True)
+    db.session.merge(address)
+    db.session.commit()
+    return 200

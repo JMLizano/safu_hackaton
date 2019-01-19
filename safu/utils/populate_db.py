@@ -31,6 +31,8 @@ conn.execute('drop table if exists address')
 conn.execute(sql_create_address_table)
 conn.execute(sql_create_trans_table)
 
+# CREATE INDEX
+conn.execute('CREATE INDEX address_ind ON address (id ASC)')
 
 # ADDRESS
 conn.execute('insert into address(id, compromised) values (\"address1\",  0)')

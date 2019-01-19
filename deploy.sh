@@ -24,16 +24,17 @@ chown -R pythonapp:pythonapp /opt/safu_hackaton
 
 # Configure supervisor to start gunicorn inside of our virtualenv and run the
 # application.
-cat >/etc/supervisor/conf.d/safu-api.conf << EOF
-[program:safuapi]
-directory=/opt/safu_hackaton
-command=pipenv run gunicorn -b :80 autoapp:app
-autostart=true
-autorestart=true
-user=pythonapp
-environment = 
-    DATABASE_URL=mysql+pymysql://${DB_USER}:${DB_PASS}@${DB_HOST}/safu
-EOF
+# cat >/etc/supervisor/conf.d/safu-api.conf << EOF
+# [program:safuapi]
+# directory=/opt/safu_hackaton
+# command=DATABASE_URL=mysql+pymysql://${DB_USER}:${DB_PASS}@${DB_HOST}/safu pipenv run gunicorn -b :80 autoapp:app
+# loglevel=debug
+# autostart=true
+# autorestart=true
+# user=pythonapp
+# EOF
 
-supervisorctl reread
-supervisorctl update
+# supervisorctl reread
+# supervisorctl update
+
+nohup pipenv run gunicorn -b :80 autoapp:app &
