@@ -19,7 +19,7 @@ environs = "==4.0.0"
 pymysql = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.5"
 
 [dev-packages]
 pylint = "*"
