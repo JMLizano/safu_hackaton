@@ -4,7 +4,7 @@ import random
 from flask import Blueprint, render_template, request
 import sqlalchemy
 from ..extensions import db
-from ..models.models import Address
+from ..models.models import Address, Transaction
 
 blueprint = Blueprint('public', __name__)
 
@@ -46,21 +46,27 @@ def home():
             incoming_transactions = address.received_from
     return render_template("home.html")
 
-@blueprint.route('/api/address/<id>', methods=['GET'])
-def get_address(id):
+@blueprint.route('/api/address/<ids>', methods=['GET'])
+def get_address(ids):
+    """Home page."""
+    print(ids.split(','))
+    addresses = Address.query.filter(Address.id.in_(ids.split(','))).all()
+    return json.dumps({ 'addresses': [ address.to_dict() for address in addresses] })
+    # outgoing_transactions = []
+    # incoming_transactions = []
+    # address = Address.query.filter_by(id=id).first()
+    # if address is not None:
+    #     outgoing_transactions = address.sended_to
+    #     incoming_transactions = address.received_from
+    
+
+@blueprint.route('/api/transaction/<id>', methods=['GET'])
+def get_transactions(id):
     """Home page."""
     outgoing_transactions = []
     incoming_transactions = []
-    address = Address.query.filter_by(id=id).first()
-    if address is not None:
-        outgoing_transactions = address.sended_to
-        incoming_transactions = address.received_from
-    return json.dumps({ 'origin': address.to_dict(), 
-                        'score': random.randint(0, 100),
-                        'outgoing_transactions': [address.to_dict() for address in outgoing_transactions], 
-                        'incoming_transactions': [address.to_dict() for address in incoming_transactions]
-                      })
-
+    trans = Transaction.query.filter_by(sender_id=id).all()
+    return json.dumps({ 'transactions': [t.to_dict() for t in trans] })
 
 @blueprint.route('/submit', methods=['GET', 'POST'])
 def outdated():

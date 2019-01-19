@@ -16,6 +16,7 @@ SQLAlchemy = "==1.2.13"
 zappa = "==0.47.0"
 # Environment variable parsing
 environs = "==4.0.0"
+pymysql = "*"
 
 [requires]
 python_version = "3.6"
