@@ -7,16 +7,17 @@ name = "pypi"
 # Flask
 Flask = "==1.0.2"
 flask-bootstrap = "==3.3.7.1"
+
 # Database
 Flask-SQLAlchemy = "==2.3.2"
 pymysql_sa = "==1.0"
 SQLAlchemy = "==1.2.13"
-# Deployment
-# gunicorn = ">=19.1.1"
-zappa = "==0.47.0"
+
 # Environment variable parsing
 environs = "==4.0.0"
-pymysql = "*"
+
+# Deployment
+gunicorn = "==19.9.0"
 
 [requires]
 python_version = "3.5"

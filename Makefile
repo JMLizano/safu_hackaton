@@ -32,14 +32,10 @@ install:
 	pipenv install --skip-lock -d
 
 populate:
-	touch safu/safu.db 
 	cd safu && pipenv run python utils/populate_db.py 
 
-deploy:
-	VIRTUAL_ENV=.venv/ pipenv run zappa deploy
-
-update:
-	VIRTUAL_ENV=.venv/ pipenv run zappa update
+# deploy:
+# 	VIRTUAL_ENV=.venv/ pipenv run zappa deploy
 
 shell:
 	@pipenv shell
