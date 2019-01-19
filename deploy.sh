@@ -31,6 +31,8 @@ command=pipenv run gunicorn -b :80 autoapp:app
 autostart=true
 autorestart=true
 user=pythonapp
+environment = 
+    DATABASE_URL=mysql+pymysql://${DB_USER}:${DB_PASS}@${DB_HOST}/safu
 EOF
 
 supervisorctl reread
