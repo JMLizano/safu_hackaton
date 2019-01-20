@@ -34,8 +34,8 @@ install:
 populate:
 	cd safu && pipenv run python utils/populate_db.py 
 
-# deploy:
-# 	VIRTUAL_ENV=.venv/ pipenv run zappa deploy
+deploy:
+	./deploy.sh
 
 shell:
 	@pipenv shell

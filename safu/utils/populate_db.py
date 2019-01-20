@@ -9,6 +9,9 @@ conn = engine.connect()
 
 sql_create_address_table = """ CREATE TABLE IF NOT EXISTS address (
                                         id VARCHAR(50),
+                                        score DOUBLE,
+                                        in_trans BIGINT,
+                                        out_trans BIGINT,
                                         compromised BOOLEAN NOT NULL,
                                         PRIMARY KEY (id)
                             ); """
@@ -22,29 +25,40 @@ sql_create_trans_table = """ CREATE TABLE IF NOT EXISTS transactions (
                                         FOREIGN KEY (receiver_id) REFERENCES address (id)
                                     ); """                                    
 
+sql_create_report_table = """ CREATE TABLE IF NOT EXISTS report (
+                                        id BIGINT AUTO_INCREMENT,
+                                        address_id varchar(80),
+                                        reporter_id varchar(80),
+                                        created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                        PRIMARY KEY (id),
+                                        FOREIGN KEY (address_id) REFERENCES address (id),
+                                        FOREIGN KEY (reporter_id) REFERENCES address (id)
+                            ); """
 
 # CLEAN EVERYTHIN
 conn.execute('drop table if exists transactions')
+conn.execute('drop table if exists report')
 conn.execute('drop table if exists address')
 
 # CREATE TABLES
 conn.execute(sql_create_address_table)
 conn.execute(sql_create_trans_table)
+conn.execute(sql_create_report_table)
 
 # CREATE INDEX
 conn.execute('CREATE INDEX address_ind ON address (id ASC)')
 
 # ADDRESS
-conn.execute('insert into address(id, compromised) values (\"address1\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address2\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address3\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address4\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address5\",  1)')
-conn.execute('insert into address(id, compromised) values (\"address6\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address7\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address8\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address9\",  0)')
-conn.execute('insert into address(id, compromised) values (\"address10\", 1)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address1\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address2\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address3\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address4\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address5\", 0.5, 5,5,  1)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address6\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address7\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address8\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address9\", 0.5, 5,5,  0)')
+conn.execute('insert into address(id, score, in_trans, out_trans, compromised) values (\"address10\", 0.5, 5, 5, 1)')
 
 # TRANSACTIONS
 conn.execute('insert into transactions values (\"address1\", \"address2\", \"testdata1\")')

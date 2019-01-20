@@ -4,7 +4,7 @@ import random
 from flask import Blueprint, render_template, request
 import sqlalchemy
 from ..extensions import db
-from ..models.models import Address, Transaction
+from ..models.models import Address, Transaction, Report
 
 blueprint = Blueprint('public', __name__)
 
@@ -33,17 +33,14 @@ def get_address(ids):
 
 @blueprint.route('/api/transaction/<id>', methods=['GET'])
 def get_transactions(id):
-    outgoing_transactions = []
-    incoming_transactions = []
     trans = Transaction.query.filter_by(sender_id=id).all()
     return json.dumps({ 'transactions': [t.to_dict() for t in trans] })
 
 
 @blueprint.route('/api/submit', methods=['POST'])
 def outdated():
-    """Outdated page."""
-    address_id =request.form.get('address', None)
-    address = Address(id=address_id, compromised=True)
-    db.session.merge(address)
+    content = request.get_json()
+    report = Report(address_id=content['address_id'], reporter_id=content['reporter_id'])
+    db.session.merge(report)
     db.session.commit()
-    return 200
+    return json.dumps({'success': True}), 200, {'ContentType':'application/json'} 
